@@ -172,6 +172,6 @@ def health():
 
 if __name__ == "__main__":
     print("🍳 老婆点菜系统启动...")
-    print("   前端: http://localhost:8090")
-    print("   API:  http://localhost:8090/api/health")
-    app.run(host="0.0.0.0", port=8090, debug=False)
+    print("   前端: http://localhost:8091")
+    print("   API:  http://localhost:8091/api/health")
+    app.run(host="0.0.0.0", port=8091, debug=False)

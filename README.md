@@ -18,7 +18,7 @@ pip install flask flask-cors
 python app.py
 ```
 
-打开手机浏览器访问 `http://[IP]:8090`
+打开手机浏览器访问 `http://[IP]:8091`
 
 ## 技术栈
 
