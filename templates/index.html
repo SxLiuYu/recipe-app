@@ -1,0 +1,669 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>老婆点菜 🍳</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg: #fff5f5;
+            --card: #fff;
+            --accent: #e74c3c;
+            --accent2: #f39c12;
+            --text: #2c3e50;
+            --text2: #7f8c8d;
+            --border: #f0e0e0;
+            --shadow: 0 2px 12px rgba(0,0,0,0.06);
+            --radius: 14px;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", "Hiragino Sans GB", sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+            padding-bottom: 80px;
+        }
+        
+        /* Header */
+        header {
+            position: sticky; top: 0; z-index: 10;
+            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            padding: 18px 20px;
+            color: white;
+            box-shadow: 0 2px 20px rgba(231,76,60,0.3);
+        }
+        header h1 {
+            font-size: 22px; font-weight: 700;
+            display: flex; align-items: center; gap: 8px;
+        }
+        header .subtitle {
+            font-size: 13px; opacity: 0.85; margin-top: 2px;
+        }
+        
+        /* Tabs */
+        .tabs {
+            display: flex; gap: 4px; padding: 12px 16px;
+            background: var(--bg); position: sticky; top: 72px; z-index: 5;
+        }
+        .tab {
+            flex: 1; padding: 10px 0; text-align: center;
+            border-radius: 10px; cursor: pointer;
+            font-size: 14px; font-weight: 600;
+            background: var(--card); color: var(--text2);
+            border: 1px solid var(--border);
+            transition: all 0.2s;
+        }
+        .tab.active {
+            background: var(--accent); color: white; border-color: var(--accent);
+        }
+        .tab .emoji { font-size: 18px; display: block; margin-bottom: 2px; }
+        
+        /* Search */
+        .search-bar {
+            margin: 0 16px 12px;
+            display: flex; gap: 8px;
+        }
+        .search-bar input {
+            flex: 1; padding: 12px 16px; border-radius: 12px;
+            border: 1px solid var(--border); font-size: 15px;
+            outline: none; background: var(--card);
+        }
+        .search-bar input:focus { border-color: var(--accent); }
+        .search-bar button {
+            padding: 12px 20px; background: var(--accent);
+            color: white; border: none; border-radius: 12px;
+            font-size: 15px; cursor: pointer; font-weight: 600;
+        }
+        
+        /* Filters */
+        .filters {
+            display: flex; gap: 8px; padding: 0 16px 12px; overflow-x: auto;
+            scrollbar-width: none; -ms-overflow-style: none;
+        }
+        .filters::-webkit-scrollbar { display: none; }
+        .filter-chip {
+            padding: 6px 14px; border-radius: 20px;
+            border: 1px solid var(--border); background: var(--card);
+            font-size: 13px; cursor: pointer; white-space: nowrap;
+            color: var(--text2);
+        }
+        .filter-chip.active {
+            background: var(--accent2); color: white; border-color: var(--accent2);
+        }
+        
+        /* Context input */
+        .context-input {
+            margin: 0 16px 12px; display: none; gap: 8px;
+        }
+        .context-input.show { display: flex; }
+        .context-input input {
+            flex: 1; padding: 12px 16px; border-radius: 12px;
+            border: 1px solid var(--border); font-size: 15px;
+            background: var(--card); outline: none;
+        }
+        .context-input button {
+            padding: 12px 16px; background: var(--accent2);
+            color: white; border: none; border-radius: 12px;
+            font-size: 14px; cursor: pointer; font-weight: 600;
+        }
+        
+        /* Cards */
+        .card-list { padding: 0 16px; }
+        .card {
+            background: var(--card); border-radius: var(--radius);
+            padding: 18px; margin-bottom: 12px;
+            box-shadow: var(--shadow);
+            border: 1px solid var(--border);
+            cursor: pointer; transition: all 0.2s;
+        }
+        .card:active { transform: scale(0.98); }
+        .card .name {
+            font-size: 18px; font-weight: 700; color: var(--text);
+            margin-bottom: 6px; display: flex; align-items: center; gap: 8px;
+        }
+        .card .meta {
+            display: flex; gap: 12px; align-items: center;
+            margin-bottom: 8px;
+        }
+        .card .tag {
+            font-size: 12px; padding: 3px 10px; border-radius: 10px;
+            font-weight: 600;
+        }
+        .tag-easy { background: #e8f5e9; color: #27ae60; }
+        .tag-medium { background: #fff3e0; color: #f39c12; }
+        .tag-hard { background: #fce4ec; color: #e74c3c; }
+        .card .time { font-size: 13px; color: var(--text2); }
+        .card .ingredients {
+            font-size: 13px; color: var(--text2);
+            display: flex; flex-wrap: wrap; gap: 6px;
+        }
+        .card .ingredient {
+            background: #fef5e7; padding: 2px 10px; border-radius: 10px;
+            font-size: 12px; color: #e67e22;
+        }
+        .card .reasons {
+            margin-top: 8px; font-size: 12px; color: var(--accent); font-weight: 600;
+        }
+        .card .actions {
+            display: flex; gap: 8px; margin-top: 12px;
+        }
+        .btn {
+            padding: 8px 16px; border-radius: 10px;
+            border: 1px solid var(--border); background: var(--card);
+            font-size: 13px; cursor: pointer; font-weight: 600;
+            transition: all 0.2s;
+        }
+        .btn-like { color: #27ae60; border-color: #27ae60; }
+        .btn-like.active { background: #27ae60; color: white; }
+        .btn-dislike { color: #e74c3c; border-color: #e74c3c; }
+        .btn-dislike.active { background: #e74c3c; color: white; }
+        .btn-order {
+            background: var(--accent); color: white; border: none;
+            flex: 1; text-align: center;
+        }
+        
+        /* Modal */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.5); z-index: 100;
+            display: flex; align-items: flex-end; justify-content: center;
+        }
+        .modal-content {
+            background: var(--card); width: 100%; max-width: 500px;
+            border-radius: 20px 20px 0 0; padding: 24px;
+            max-height: 80vh; overflow-y: auto;
+        }
+        .modal h2 { font-size: 22px; margin-bottom: 12px; }
+        .modal .steps { margin: 16px 0; }
+        .modal .step {
+            padding: 10px 0; border-bottom: 1px solid var(--border);
+            display: flex; gap: 12px; font-size: 15px;
+        }
+        .modal .step-num {
+            width: 28px; height: 28px; background: var(--accent);
+            color: white; border-radius: 50%; display: flex;
+            align-items: center; justify-content: center;
+            font-size: 13px; font-weight: 700; flex-shrink: 0;
+        }
+        .modal .btn-close {
+            width: 100%; padding: 14px; background: var(--accent);
+            color: white; border: none; border-radius: 12px;
+            font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px;
+        }
+        
+        /* Toast */
+        .toast {
+            position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
+            background: #2c3e50; color: white; padding: 12px 24px;
+            border-radius: 24px; font-size: 14px; font-weight: 600;
+            z-index: 200; opacity: 0; transition: opacity 0.3s;
+        }
+        .toast.show { opacity: 1; }
+        
+        /* Empty */
+        .empty { text-align: center; padding: 40px 20px; color: var(--text2); }
+        
+        /* Profile bar */
+        .profile-bar {
+            margin: 0 16px 12px; padding: 12px 16px;
+            background: var(--card); border-radius: var(--radius);
+            border: 1px solid var(--border);
+            display: flex; align-items: center; gap: 12px;
+            font-size: 13px; color: var(--text2);
+        }
+        .profile-bar .avatar { font-size: 28px; }
+        .profile-bar .stats { flex: 1; }
+        .profile-bar .stat-num { font-weight: 700; color: var(--text); }
+        
+        /* count badge */
+        .count-badge {
+            font-size: 12px; background: rgba(255,255,255,0.2);
+            padding: 2px 8px; border-radius: 10px; margin-left: 6px;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>🍳 老婆点菜 <span class="count-badge" id="recipe-count">175道</span></h1>
+        <div class="subtitle" id="header-sub">你的专属智能菜单</div>
+    </header>
+    
+    <div class="tabs">
+        <div class="tab active" onclick="switchTab('recommend')">
+            <span class="emoji">🌟</span>今日推荐
+        </div>
+        <div class="tab" onclick="switchTab('context')">
+            <span class="emoji">💬</span>想吃什么
+        </div>
+        <div class="tab" onclick="switchTab('browse')">
+            <span class="emoji">📖</span>全部菜谱
+        </div>
+        <div class="tab" onclick="switchTab('profile')">
+            <span class="emoji">👩</span>我的口味
+        </div>
+    </div>
+    
+    <!-- Search (browse tab) -->
+    <div class="search-bar" id="search-bar" style="display:none">
+        <input type="text" placeholder="搜菜名、搜食材..." id="search-input" oninput="search()">
+    </div>
+    
+    <!-- Filters (browse tab) -->
+    <div class="filters" id="filters" style="display:none">
+        <div class="filter-chip active" onclick="setFilter('all', this)">全部</div>
+        <div class="filter-chip" onclick="setFilter('简单', this)">简单</div>
+        <div class="filter-chip" onclick="setFilter('中等', this)">中等</div>
+        <div class="filter-chip" onclick="setFilter('困难', this)">困难</div>
+        <div class="filter-chip" onclick="setFilter('快手', this)">⏱ ≤15分钟</div>
+        <div class="filter-chip" onclick="setFilter('素菜', this)">🥬 素菜</div>
+        <div class="filter-chip" onclick="setFilter('荤菜', this)">🥩 荤菜</div>
+    </div>
+    
+    <!-- Context input -->
+    <div class="context-input" id="context-input">
+        <input type="text" placeholder="比如：想吃点辣的、今天想吃肉、来点清爽的..." id="context-query">
+        <button onclick="recommendContext()">找菜</button>
+    </div>
+    
+    <!-- Main content -->
+    <div class="card-list" id="card-list"></div>
+    
+    <!-- Profile view -->
+    <div id="profile-view" style="display:none; padding: 0 16px;"></div>
+    
+    <!-- Modal -->
+    <div class="modal" id="modal" style="display:none" onclick="closeModal(event)">
+        <div class="modal-content" id="modal-content" onclick="event.stopPropagation()"></div>
+    </div>
+    
+    <!-- Toast -->
+    <div class="toast" id="toast"></div>
+    
+    <script>
+        const API = '';
+        let currentTab = 'recommend';
+        let currentFilter = 'all';
+        let allRecipes = [];
+        let profile = {};
+        
+        async function init() {
+            await Promise.all([loadRecipes(), loadProfile()]);
+            switchTab('recommend');
+        }
+        
+        async function loadRecipes() {
+            const res = await fetch(API + '/api/recipes/all');
+            const data = await res.json();
+            allRecipes = data.recipes || [];
+            document.getElementById('recipe-count').textContent = allRecipes.length + '道';
+        }
+        
+        async function loadProfile() {
+            const res = await fetch(API + '/api/user/profile');
+            profile = await res.json();
+        }
+        
+        function switchTab(tab) {
+            currentTab = tab;
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab')[['recommend','context','browse','profile'].indexOf(tab)].classList.add('active');
+            
+            document.getElementById('search-bar').style.display = tab === 'browse' ? 'flex' : 'none';
+            document.getElementById('filters').style.display = tab === 'browse' ? 'flex' : 'none';
+            document.getElementById('context-input').classList.toggle('show', tab === 'context');
+            document.getElementById('profile-view').style.display = tab === 'profile' ? 'block' : 'none';
+            document.getElementById('card-list').style.display = tab !== 'profile' ? 'block' : 'none';
+            
+            if (tab === 'recommend') loadRecommend();
+            else if (tab === 'context') { document.getElementById('context-query').focus(); renderCards([]); }
+            else if (tab === 'browse') { document.getElementById('search-input').value = ''; renderAll(); }
+            else if (tab === 'profile') renderProfile();
+        }
+        
+        async function loadRecommend() {
+            const res = await fetch(API + '/api/recommend/daily');
+            const data = await res.json();
+            document.getElementById('header-sub').textContent = '今日为你精选';
+            renderCards(data.recommendations || []);
+        }
+        
+        async function recommendContext() {
+            const query = document.getElementById('context-query').value.trim();
+            if (!query) return;
+            const res = await fetch(API + '/api/recommend/context', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({context: query})
+            });
+            const data = await res.json();
+            document.getElementById('header-sub').textContent = `"${query}" 的推荐`;
+            renderCards(data.recommendations || []);
+        }
+        
+        function search() {
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+            if (!keyword) { renderAll(); return; }
+            const filtered = allRecipes.filter(r =>
+                r.name.toLowerCase().includes(keyword) ||
+                r.ingredients.some(i => i.toLowerCase().includes(keyword))
+            );
+            renderCards(filtered);
+        }
+        
+        function setFilter(filter, el) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-chip').forEach(c => c.classList.remove('active'));
+            el.classList.add('active');
+            renderAll();
+        }
+        
+        function renderAll() {
+            let recipes = [...allRecipes];
+            if (currentFilter === '简单') recipes = recipes.filter(r => r.difficulty === '简单');
+            else if (currentFilter === '中等') recipes = recipes.filter(r => r.difficulty === '中等');
+            else if (currentFilter === '困难') recipes = recipes.filter(r => r.difficulty === '困难');
+            else if (currentFilter === '快手') recipes = recipes.filter(r => {
+                const t = r.time || '';
+                const m = parseInt(t);
+                return m && m <= 15;
+            });
+            else if (currentFilter === '素菜') {
+                const meats = ['肉','鸡','鱼','虾','牛','羊','猪','排骨','翅','腿','蛋'];
+                recipes = recipes.filter(r => !r.ingredients.some(i => meats.some(m => i.includes(m))));
+            }
+            else if (currentFilter === '荤菜') {
+                const meats = ['肉','鸡','鱼','虾','牛','羊','猪','排骨','翅','腿'];
+                recipes = recipes.filter(r => r.ingredients.some(i => meats.some(m => i.includes(m))));
+            }
+            
+            const keyword = document.getElementById('search-input').value.toLowerCase();
+            if (keyword) {
+                recipes = recipes.filter(r =>
+                    r.name.toLowerCase().includes(keyword) ||
+                    r.ingredients.some(i => i.toLowerCase().includes(keyword))
+                );
+            }
+            
+            document.getElementById('header-sub').textContent = `共 ${recipes.length} 道菜`;
+            renderCards(recipes);
+        }
+        
+        function renderCards(recipes) {
+            const container = document.getElementById('card-list');
+            if (!recipes.length) {
+                container.innerHTML = '<div class="empty">🫗 没有找到匹配的菜，试试换个说法？</div>';
+                return;
+            }
+            
+            container.innerHTML = recipes.map((r, i) => {
+                const diffClass = r.difficulty === '简单' ? 'tag-easy' : r.difficulty === '困难' ? 'tag-hard' : 'tag-medium';
+                const reasons = r._reasons ? `<div class="reasons">${r._reasons.join(' ')}</div>` : '';
+                const isFav = (profile.favorites || []).includes(r.name);
+                const isDis = (profile.dislikes || []).includes(r.name);
+                
+                return ` + "`" + `
+                <div class="card" onclick="openDetail(${i})">
+                    <div class="name">
+                        ${r.name}
+                        ${r._score > 80 ? '⭐' : ''}
+                    </div>
+                    <div class="meta">
+                        <span class="tag ${diffClass}">${r.difficulty || '?'}</span>
+                        <span class="time">⏱ ${r.time || '?'}</span>
+                    </div>
+                    <div class="ingredients">
+                        ${(r.ingredients || []).slice(0, 6).map(ing => 
+                            '<span class="ingredient">' + ing + '</span>'
+                        ).join('')}
+                    </div>
+                    ${reasons}
+                    <div class="actions" onclick="event.stopPropagation()">
+                        <button class="btn btn-like ${isFav ? 'active' : ''}" onclick="toggleFavorite('${r.name}', this)">${isFav ? '❤️' : '🤍'} 喜欢</button>
+                        <button class="btn btn-dislike ${isDis ? 'active' : ''}" onclick="toggleDislike('${r.name}', this)">👎 不吃</button>
+                        <button class="btn btn-order" onclick="orderDish('${r.name}', this)">📋 就吃这个</button>
+                    </div>
+                </div>
+                ` + "`" + `;
+            }).join('');
+            
+            // Store recipes for detail view
+            window._currentRecipes = recipes;
+        }
+        
+        function openDetail(idx) {
+            const r = window._currentRecipes[idx];
+            const diffClass = r.difficulty === '简单' ? 'tag-easy' : r.difficulty === '困难' ? 'tag-hard' : 'tag-medium';
+            const steps = (r.steps || []).map((s, i) =>
+                '<div class="step"><span class="step-num">' + (i+1) + '</span><span>' + s + '</span></div>'
+            ).join('');
+            
+            const modalContent = document.getElementById('modal-content');
+            modalContent.innerHTML = `
+                <h2>🍳 ${r.name}</h2>
+                <div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">
+                    <span class="tag ${diffClass}">${r.difficulty || '?'}</span>
+                    <span style="font-size:13px;color:#7f8c8d">⏱ ${r.time || '?'}</span>
+                </div>
+                <div style="font-size:14px;color:#7f8c8d;margin-bottom:8px">
+                    📦 食材：${(r.ingredients || []).join('、')}
+                </div>
+                <h3 style="margin:16px 0 8px">📝 做法</h3>
+                <div class="steps">${steps}</div>
+                <button class="btn-close" onclick="closeModal()">知道了 👍</button>
+            `;
+            document.getElementById('modal').style.display = 'flex';
+        }
+        
+        function closeModal(e) {
+            if (e && e.target !== document.getElementById('modal')) return;
+            document.getElementById('modal').style.display = 'none';
+        }
+        
+        async function toggleFavorite(name, btn) {
+            const isFav = (profile.favorites || []).includes(name);
+            const url = API + (isFav ? '/api/user/unfavorite' : '/api/user/favorite');
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({dish: name})
+            });
+            profile = await res.json();
+            toast(isFav ? '已取消收藏' : '已加入收藏 ❤️');
+            refreshCurrentView();
+        }
+        
+        async function toggleDislike(name, btn) {
+            const isDis = (profile.dislikes || []).includes(name);
+            const url = API + (isDis ? '/api/user/undislike' : '/api/user/dislike');
+            const res = await fetch(url, {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({dish: name})
+            });
+            profile = await res.json();
+            toast(isDis ? '已取消' : '已标记不喜欢');
+            refreshCurrentView();
+        }
+        
+        async function orderDish(name, btn) {
+            const res = await fetch(API + '/api/order', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({dish: name})
+            });
+            await res.json();
+            toast('✅ 今天吃「' + name + '」！已记录');
+            // Reload profile for updated stats
+            await loadProfile();
+        }
+        
+        function refreshCurrentView() {
+            if (currentTab === 'recommend') loadRecommend();
+            else if (currentTab === 'browse') renderAll();
+        }
+        
+        function toast(msg) {
+            const el = document.getElementById('toast');
+            el.textContent = msg;
+            el.classList.add('show');
+            setTimeout(() => el.classList.remove('show'), 2000);
+        }
+        
+        async function renderProfile() {
+            const view = document.getElementById('profile-view');
+            const taste = profile.taste || {};
+            const pref = profile.preferences || {};
+            const stats = profile.stats || {};
+            
+            const tasteLabels = {
+                spiciness: ['不吃辣','微微辣','微辣','中辣','很辣','无辣不欢'],
+                saltiness: ['极淡','偏淡','正常','偏咸','很咸','重咸'],
+                sweetness: ['不甜','微甜','正常','偏甜','很甜','嗜甜'],
+                sourness: ['不酸','微酸','正常','偏酸','很酸','嗜酸']
+            };
+            
+            let tasteHTML = '';
+            for (const [key, val] of Object.entries(taste)) {
+                const labels = tasteLabels[key] || ['?','?','?','?','?','?'];
+                tasteHTML += `
+                    <div style="margin-bottom:12px">
+                        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+                            <span>${key === 'spiciness' ? '🌶 辣度' : key === 'saltiness' ? '🧂 咸度' : key === 'sweetness' ? '🍬 甜度' : '🍋 酸度'}</span>
+                            <span style="color:#e74c3c;font-weight:600">${labels[val]}</span>
+                        </div>
+                        <div style="display:flex;gap:4px">
+                            ${[0,1,2,3,4,5].map(i => ` + "`" + `
+                                <div style="flex:1;height:6px;border-radius:3px;background:${i <= val ? '#e74c3c' : '#f0e0e0'}"></div>
+                            ` + "`" + `).join('')}
+                        </div>
+                    </div>
+                `;
+            }
+            
+            const topDishes = profile.top_dishes || [];
+            
+            view.innerHTML = `
+                <div class="profile-bar" style="margin-bottom:16px">
+                    <div class="avatar">👩</div>
+                    <div class="stats">
+                        <div><span class="stat-num">${stats.total_orders || 0}</span> 次点菜</div>
+                        <div><span class="stat-num">${(profile.favorites || []).length}</span> 道收藏</div>
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-bottom:12px">
+                    <h3 style="margin-bottom:12px">😋 口味偏好</h3>
+                    ${tasteHTML}
+                </div>
+                
+                <div class="card" style="margin-bottom:12px">
+                    <h3 style="margin-bottom:8px">❤️ 喜欢的菜系</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px">
+                        ${(pref.favorite_cuisines || []).length ? pref.favorite_cuisines.map(c => '<span class="ingredient" style="background:#fce4ec;color:#e74c3c">'+c+'</span>').join('') : '<span style="color:#7f8c8d;font-size:13px">还没设置，多点几次菜就知道了~</span>'}
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-bottom:12px">
+                    <h3 style="margin-bottom:8px">🚫 不吃的食材</h3>
+                    <div style="display:flex;flex-wrap:wrap;gap:6px">
+                        ${(pref.disliked_ingredients || []).length ? pref.disliked_ingredients.map(c => '<span class="ingredient" style="background:#fce4ec;color:#e74c3c">'+c+'</span>').join('') : '<span style="color:#7f8c8d;font-size:13px">还没有，遇到不喜欢的点「不吃」就好</span>'}
+                    </div>
+                </div>
+                
+                <div class="card" style="margin-bottom:12px">
+                    <h3 style="margin-bottom:8px">⭐ 最常点的菜</h3>
+                    ${topDishes.length ? topDishes.map((d,i) => ` + "`" + `
+                        <div style="padding:6px 0;border-bottom:1px solid #f0e0e0;display:flex;justify-content:space-between">
+                            <span>${i+1}. ${d.name}</span>
+                            <span style="color:#7f8c8d;font-size:12px">${d.count}次</span>
+                        </div>
+                    ` + "`" + `).join('') : '<div style="color:#7f8c8d;font-size:13px">还没有点菜记录，从今天开始吧~</div>'}
+                </div>
+                
+                <div style="text-align:center;padding:20px">
+                    <button class="btn" style="background:#e74c3c;color:white;border:none;padding:12px 32px;font-size:15px" onclick="editProfile()">✏️ 调整口味偏好</button>
+                </div>
+            `;
+        }
+        
+        function editProfile() {
+            const taste = profile.taste || {};
+            const pref = profile.preferences || {};
+            
+            let html = '<h2>✏️ 调整口味偏好</h2>';
+            
+            for (const [key, val] of Object.entries({spiciness:'辣度', saltiness:'咸度', sweetness:'甜度', sourness:'酸度'})) {
+                const labels = key === 'spiciness' ? ['不吃辣','微微辣','微辣','中辣','很辣','无辣不欢']
+                    : key === 'saltiness' ? ['极淡','偏淡','正常','偏咸','很咸','重咸']
+                    : key === 'sweetness' ? ['不甜','微甜','正常','偏甜','很甜','嗜甜']
+                    : ['不酸','微酸','正常','偏酸','很酸','嗜酸'];
+                html += ` + "`" + `
+                    <div style="margin:16px 0">
+                        <label style="font-size:14px;font-weight:600;display:block;margin-bottom:8px">${val}</label>
+                        <div style="display:flex;gap:4px">
+                            ${labels.map((l, i) => ` + "`" + `
+                                <button onclick="setTaste('${key}', ${i})" style="flex:1;padding:8px 4px;border-radius:8px;border:1px solid ${i === taste[key] ? '#e74c3c' : '#f0e0e0'};background:${i === taste[key] ? '#e74c3c' : '#fff'};color:${i === taste[key] ? '#fff' : '#7f8c8d'};font-size:11px;cursor:pointer">${l}</button>
+                            ` + "`" + `).join('')}
+                        </div>
+                    </div>
+                ` + "`" + `;
+            }
+            
+            // Favorite cuisines
+            const allCuisines = ['川菜','粤菜','湘菜','东北菜','江浙菜','西北菜','鲁菜','闽菜','徽菜','家常菜'];
+            const favCuisines = pref.favorite_cuisines || [];
+            html += '<div style="margin:16px 0"><label style="font-size:14px;font-weight:600;display:block;margin-bottom:8px">喜欢的菜系</label><div style="display:flex;flex-wrap:wrap;gap:6px">';
+            allCuisines.forEach(c => {
+                const active = favCuisines.includes(c);
+                html += `<button onclick="toggleCuisine('${c}', this)" style="padding:6px 14px;border-radius:16px;border:1px solid ${active ? '#e74c3c' : '#f0e0e0'};background:${active ? '#e74c3c' : '#fff'};color:${active ? '#fff' : '#7f8c8d'};font-size:13px;cursor:pointer">${c}</button>`;
+            });
+            html += '</div></div>';
+            
+            // Save button
+            html += '<button class="btn-close" onclick="saveProfile()" style="margin-top:12px">💾 保存</button>';
+            
+            document.getElementById('modal-content').innerHTML = html;
+            document.getElementById('modal').style.display = 'flex';
+        }
+        
+        async function setTaste(key, value) {
+            profile.taste = profile.taste || {};
+            profile.taste[key] = value;
+            editProfile(); // refresh modal
+        }
+        
+        function toggleCuisine(cuisine, btn) {
+            profile.preferences = profile.preferences || {};
+            let cuisines = profile.preferences.favorite_cuisines || [];
+            if (cuisines.includes(cuisine)) {
+                cuisines = cuisines.filter(c => c !== cuisine);
+            } else {
+                cuisines.push(cuisine);
+            }
+            profile.preferences.favorite_cuisines = cuisines;
+            editProfile(); // refresh
+        }
+        
+        async function saveProfile() {
+            const res = await fetch(API + '/api/user/profile', {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify({
+                    taste: profile.taste,
+                    preferences: profile.preferences
+                })
+            });
+            profile = await res.json();
+            closeModal();
+            renderProfile();
+            toast('口味已保存 ✅');
+        }
+        
+        // Init
+        init();
+    </script>
+</body>
+</html>
