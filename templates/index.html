@@ -7,9 +7,9 @@
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         :root {
-            --bg: #fff5f5; --card: #fff; --accent: #e74c3c; --accent2: #f39c12;
-            --text: #2c3e50; --text2: #7f8c8d; --border: #f0e0e0;
-            --shadow: 0 2px 12px rgba(0,0,0,0.06); --radius: 14px;
+            --bg: #f8f6f3; --card: #fff; --accent: #d9776c; --accent2: #e8a87c;
+            --text: #3d3432; --text2: #999089; --border: #ede8e2;
+            --shadow: 0 2px 16px rgba(0,0,0,0.05); --radius: 16px;
         }
         body {
             font-family: -apple-system, BlinkMacSystemFont, "PingFang SC", sans-serif;
@@ -17,61 +17,66 @@
         }
         header {
             position: sticky; top: 0; z-index: 10;
-            background: linear-gradient(135deg, #e74c3c, #c0392b);
+            background: linear-gradient(135deg, #d9776c, #c0847a);
             padding: 18px 20px; color: white;
-            box-shadow: 0 2px 20px rgba(231,76,60,0.3);
+            box-shadow: 0 2px 20px rgba(217,119,108,0.25);
         }
         header h1 { font-size: 22px; font-weight: 700; }
         header .subtitle { font-size: 13px; opacity: 0.85; margin-top: 2px; }
         .tabs {
-            display: flex; gap: 4px; padding: 12px 16px;
+            display: flex; gap: 6px; padding: 14px 16px;
             position: sticky; top: 72px; z-index: 5; background: var(--bg);
         }
         .tab {
-            flex: 1; padding: 10px 0; text-align: center; border-radius: 10px;
+            flex: 1; padding: 10px 0; text-align: center; border-radius: 12px;
             cursor: pointer; font-size: 14px; font-weight: 600;
             background: var(--card); color: var(--text2);
-            border: 1px solid var(--border); transition: all 0.2s;
+            border: 1.5px solid var(--border); transition: all 0.2s;
         }
-        .tab.active { background: var(--accent); color: white; border-color: var(--accent); }
+        .tab.active { background: var(--accent); color: white; border-color: var(--accent); box-shadow: 0 2px 8px rgba(217,119,108,0.3); }
         .search-bar { margin: 0 16px 12px; display: flex; gap: 8px; }
         .search-bar input {
-            flex: 1; padding: 12px 16px; border-radius: 12px;
-            border: 1px solid var(--border); font-size: 15px; background: var(--card);
+            flex: 1; padding: 12px 16px; border-radius: 14px;
+            border: 1.5px solid var(--border); font-size: 15px; background: var(--card);
+            outline: none; transition: border-color 0.2s;
         }
+        .search-bar input:focus { border-color: var(--accent); }
         .search-bar button {
             padding: 12px 20px; background: var(--accent);
-            color: white; border: none; border-radius: 12px;
+            color: white; border: none; border-radius: 14px;
             font-size: 15px; cursor: pointer; font-weight: 600;
         }
         .filters {
-            display: flex; gap: 8px; padding: 0 16px 12px; overflow-x: auto;
+            display: flex; gap: 8px; padding: 0 16px 14px;
+            flex-wrap: wrap;
         }
-        .filters::-webkit-scrollbar { display: none; }
-        .filters { flex-wrap: wrap; row-gap: 6px; }
         .filter-chip {
-            padding: 6px 14px; border-radius: 20px;
-            border: 1px solid var(--border); background: var(--card);
+            padding: 8px 16px; border-radius: 22px;
+            border: 1.5px solid var(--border); background: var(--card);
             font-size: 13px; cursor: pointer; white-space: nowrap; color: var(--text2);
+            font-weight: 500; transition: all 0.2s;
         }
+        .filter-chip:hover { border-color: var(--accent2); color: var(--text); }
         .filter-chip.active {
             background: var(--accent2); color: white; border-color: var(--accent2);
+            box-shadow: 0 2px 8px rgba(232,168,124,0.3);
         }
         .context-input { margin: 0 16px 12px; display: none; gap: 8px; }
         .context-input.show { display: flex; }
         .context-input input {
-            flex: 1; padding: 12px 16px; border-radius: 12px;
-            border: 1px solid var(--border); font-size: 15px; background: var(--card);
+            flex: 1; padding: 12px 16px; border-radius: 14px;
+            border: 1.5px solid var(--border); font-size: 15px; background: var(--card);
+            outline: none;
         }
         .context-input button {
-            padding: 12px 16px; background: var(--accent2);
-            color: white; border: none; border-radius: 12px;
+            padding: 12px 20px; background: var(--accent2);
+            color: white; border: none; border-radius: 14px;
             font-size: 14px; cursor: pointer; font-weight: 600;
         }
         .card-list { padding: 0 16px; }
         .card {
             background: var(--card); border-radius: var(--radius);
-            padding: 18px; margin-bottom: 12px;
+            padding: 20px; margin-bottom: 14px;
             box-shadow: var(--shadow); border: 1px solid var(--border);
             cursor: pointer; transition: all 0.2s;
         }
@@ -82,37 +87,41 @@
             font-size: 12px; padding: 3px 10px; border-radius: 10px; font-weight: 600;
         }
         .tag-easy { background: #e8f5e9; color: #27ae60; }
-        .tag-medium { background: #fff3e0; color: #f39c12; }
-        .tag-hard { background: #fce4ec; color: #e74c3c; }
+        .tag-medium { background: #fff3e0; color: #e8a87c; }
+        .tag-hard { background: #fce4ec; color: #c0847a; }
         .card .time { font-size: 13px; color: var(--text2); }
         .card .ingredients { display: flex; flex-wrap: wrap; gap: 6px; font-size: 13px; }
         .ingredient {
-            background: #fef5e7; padding: 2px 10px; border-radius: 10px;
-            font-size: 12px; color: #e67e22;
+            background: #fdf4ea; padding: 3px 12px; border-radius: 10px;
+            font-size: 12px; color: #b88230;
         }
         .card .reasons { margin-top: 8px; font-size: 12px; color: var(--accent); font-weight: 600; }
-        .card .actions { display: flex; gap: 8px; margin-top: 12px; }
+        .card .actions { display: flex; gap: 8px; margin-top: 14px; }
         .btn {
-            padding: 8px 16px; border-radius: 10px;
-            border: 1px solid var(--border); background: var(--card);
+            padding: 9px 16px; border-radius: 10px;
+            border: 1.5px solid var(--border); background: var(--card);
             font-size: 13px; cursor: pointer; font-weight: 600; transition: all 0.2s;
         }
         .btn-like { color: #27ae60; border-color: #27ae60; }
+        .btn-like:hover { background: #e8f5e9; }
         .btn-like.active { background: #27ae60; color: white; }
-        .btn-dislike { color: #e74c3c; border-color: #e74c3c; }
-        .btn-dislike.active { background: #e74c3c; color: white; }
+        .btn-dislike { color: #c0847a; border-color: #c0847a; }
+        .btn-dislike:hover { background: #fdf2f0; }
+        .btn-dislike.active { background: #c0847a; color: white; }
         .btn-order {
             background: var(--accent); color: white; border: none;
             flex: 1; text-align: center;
         }
+        .btn-order:hover { opacity: 0.9; }
         .modal {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0,0,0,0.5); z-index: 100;
+            background: rgba(0,0,0,0.4); z-index: 100;
             display: flex; align-items: flex-end; justify-content: center;
+            backdrop-filter: blur(2px);
         }
         .modal-content {
             background: var(--card); width: 100%; max-width: 500px;
-            border-radius: 20px 20px 0 0; padding: 24px;
+            border-radius: 22px 22px 0 0; padding: 28px;
             max-height: 80vh; overflow-y: auto;
         }
         .modal h2 { font-size: 22px; margin-bottom: 12px; }
@@ -128,131 +137,61 @@
         }
         .btn-close {
             width: 100%; padding: 14px; background: var(--accent);
-            color: white; border: none; border-radius: 12px;
-            font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 12px;
+            color: white; border: none; border-radius: 14px;
+            font-size: 16px; font-weight: 700; cursor: pointer; margin-top: 16px;
         }
         .toast {
             position: fixed; bottom: 100px; left: 50%; transform: translateX(-50%);
-            background: #2c3e50; color: white; padding: 12px 24px;
+            background: #3d3432; color: white; padding: 12px 24px;
             border-radius: 24px; font-size: 14px; font-weight: 600;
-            z-index: 200; opacity: 0; transition: opacity 0.3s;
+            z-index: 200; opacity: 0; transition: opacity 0.3s; pointer-events: none;
         }
         .toast.show { opacity: 1; }
-        .empty { text-align: center; padding: 40px 20px; color: var(--text2); }
+        .empty { text-align: center; padding: 60px 20px; color: var(--text2); font-size: 15px; }
         .profile-bar {
-            margin: 0 16px 12px; padding: 12px 16px;
+            margin: 0 16px 14px; padding: 16px;
             background: var(--card); border-radius: var(--radius);
             border: 1px solid var(--border);
-            display: flex; align-items: center; gap: 12px;
+            display: flex; align-items: center; gap: 14px;
             font-size: 13px; color: var(--text2);
         }
     
-        /* ── Desktop Layout (>768px) ── */
+        /* ── Desktop (>768px) ── */
         @media (min-width: 768px) {
-            body {
-                max-width: 1200px;
-                margin: 0 auto;
-                background: #fafafa;
-            }
-            
-            header {
-                border-radius: 0 0 20px 20px;
-                padding: 24px 32px;
-            }
+            body { max-width: 1200px; margin: 0 auto; background: #f5f3f0; }
+            header { border-radius: 0 0 24px 24px; padding: 28px 36px; }
             header h1 { font-size: 28px; }
-            
-            .tabs {
-                max-width: 600px;
-                margin: 0 auto;
-                position: static;
-                padding: 20px 0 12px;
-                background: transparent;
-            }
-            
-            .search-bar {
-                max-width: 600px;
-                margin: 0 auto 16px;
-            }
-            
-            .filters {
-                max-width: 600px;
-                margin: 0 auto 16px;
-                justify-content: center;
-            }
-            
-            .context-input {
-                max-width: 600px;
-                margin: 0 auto 16px;
-            }
-            
-            .card-list {
-                display: grid;
-                grid-template-columns: repeat(2, 1fr);
-                gap: 16px;
-                max-width: 900px;
-                margin: 0 auto;
-                padding: 0 24px;
-            }
-            
-            .card {
-                margin-bottom: 0;
-                transition: transform 0.2s, box-shadow 0.2s;
-            }
-            .card:hover {
-                transform: translateY(-2px);
-                box-shadow: 0 8px 24px rgba(0,0,0,0.1);
-            }
+            .tabs { max-width: 600px; margin: 0 auto; position: static; padding: 24px 0 16px; background: transparent; }
+            .search-bar { max-width: 600px; margin: 0 auto 16px; }
+            .filters { max-width: 600px; margin: 0 auto 16px; justify-content: center; }
+            .context-input { max-width: 600px; margin: 0 auto 16px; }
+            .card-list { display: grid; grid-template-columns: repeat(2, 1fr); gap: 18px; max-width: 900px; margin: 0 auto; padding: 0 24px; }
+            .card { margin-bottom: 0; transition: transform 0.2s, box-shadow 0.2s; }
+            .card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.08); }
             .card:active { transform: scale(0.99); }
-            
-            .profile-bar {
-                max-width: 600px;
-                margin: 0 auto 16px;
-            }
-            
-            #profile-view {
-                max-width: 600px;
-                margin: 0 auto;
-            }
-            
-            .modal-content {
-                border-radius: 20px;
-                max-width: 600px;
-                max-height: 85vh;
-            }
-            
-            .toast {
-                bottom: 40px;
-                font-size: 15px;
-                padding: 14px 28px;
-            }
+            .profile-bar { max-width: 600px; margin: 0 auto 16px; }
+            #profile-view { max-width: 600px; margin: 0 auto; }
+            .modal-content { border-radius: 24px; max-width: 600px; max-height: 85vh; }
+            .toast { bottom: 40px; font-size: 15px; padding: 14px 28px; }
         }
-        
-        /* ── Large Desktop (>1024px) ── */
         @media (min-width: 1024px) {
-            .card-list {
-                grid-template-columns: repeat(3, 1fr);
-                max-width: 1100px;
-            }
-            
-            .card {
-                padding: 24px;
-            }
-            
+            .card-list { grid-template-columns: repeat(3, 1fr); max-width: 1100px; }
+            .card { padding: 24px; }
             .card .name { font-size: 20px; }
         }
-</style>
+    </style>
 </head>
 <body>
     <header>
-        <h1>老婆点菜</h1>
+        <h1>老婆点菜 🍳</h1>
         <div class="subtitle" id="header-sub">你的专属智能菜单</div>
     </header>
     
     <div class="tabs">
-        <div class="tab active" onclick="switchTab('recommend')">今日推荐</div>
-        <div class="tab" onclick="switchTab('context')">想吃什么</div>
-        <div class="tab" onclick="switchTab('browse')">全部菜谱</div>
-        <div class="tab" onclick="switchTab('profile')">我的口味</div>
+        <div class="tab active" onclick="switchTab('recommend')">✨ 推荐</div>
+        <div class="tab" onclick="switchTab('context')">💬 想吃啥</div>
+        <div class="tab" onclick="switchTab('browse')">📖 全部菜谱</div>
+        <div class="tab" onclick="switchTab('profile')">👤 我的口味</div>
     </div>
     
     <div class="search-bar" id="search-bar" style="display:none">
@@ -261,21 +200,21 @@
     
     <div class="filters" id="filters" style="display:none">
         <button class="filter-chip active" onclick="setFilter('all', this)">全部</button>
-        <button class="filter-chip" onclick="setFilter('下饭', this)">下饭</button>
-        <button class="filter-chip" onclick="setFilter('麻辣', this)">麻辣</button>
-        <button class="filter-chip" onclick="setFilter('清淡', this)">清淡</button>
-        <button class="filter-chip" onclick="setFilter('酸甜', this)">酸甜</button>
-        <button class="filter-chip" onclick="setFilter('鲜香', this)">鲜香</button>
-        <button class="filter-chip" onclick="setFilter('爽口', this)">爽口</button>
-        <button class="filter-chip" onclick="setFilter('浓郁', this)">浓郁</button>
-        <button class="filter-chip" onclick="setFilter('酥脆', this)">酥脆</button>
-        <button class="filter-chip" onclick="setFilter('软糯', this)">软糯</button>
-        <button class="filter-chip" onclick="setFilter('开胃', this)">开胃</button>
-        <button class="filter-chip" onclick="setFilter('快手', this)">快手菜</button>
+        <button class="filter-chip" onclick="setFilter('下饭', this)">🍚 下饭</button>
+        <button class="filter-chip" onclick="setFilter('麻辣', this)">🌶️ 麻辣</button>
+        <button class="filter-chip" onclick="setFilter('清淡', this)">🥬 清淡</button>
+        <button class="filter-chip" onclick="setFilter('酸甜', this)">🍋 酸甜</button>
+        <button class="filter-chip" onclick="setFilter('鲜香', this)">🦐 鲜香</button>
+        <button class="filter-chip" onclick="setFilter('爽口', this)">🥒 爽口</button>
+        <button class="filter-chip" onclick="setFilter('浓郁', this)">🍲 浓郁</button>
+        <button class="filter-chip" onclick="setFilter('酥脆', this)">🥐 酥脆</button>
+        <button class="filter-chip" onclick="setFilter('软糯', this)">🍠 软糯</button>
+        <button class="filter-chip" onclick="setFilter('开胃', this)">🤤 开胃</button>
+        <button class="filter-chip" onclick="setFilter('快手', this)">⚡ 快手</button>
     </div>
     
     <div class="context-input" id="context-input">
-        <input type="text" placeholder="想吃辣的、想吃肉、来点清爽的..." id="context-query">
+        <input type="text" placeholder="想吃辣的、想吃肉、来点清爽的..." id="context-query" onkeydown="if(event.key==='Enter')recommendContext()">
         <button onclick="recommendContext()">找菜</button>
     </div>
     
@@ -378,7 +317,6 @@ function setFilter(filter, el) {
 function renderAll() {
     var recipes = allRecipes.slice();
     
-    // Category-based filters
     var tasteKeywords = {
         '下饭': ['红烧','焖','炖','酱','烧','卤','回锅','干煸','宫保','鱼香','麻婆','水煮','小炒','肉末','蒜蓉','蚝油','锅包','京酱','黄焖','咖喱','番茄'],
         '麻辣': ['麻辣','辣','辣椒','花椒','干辣椒','红油','剁椒','泡椒','豆瓣','麻婆','水煮','辣子','香辣','酸辣','藤椒'],
@@ -393,11 +331,13 @@ function renderAll() {
         '快手': [],
     };
     
-    if (tasteKeywords[currentFilter]) {
+    if (currentFilter !== 'all' && tasteKeywords[currentFilter]) {
         var kws = tasteKeywords[currentFilter];
         if (currentFilter === '快手') {
             recipes = recipes.filter(function(r) {
-                var t = r.time || ''; var m = parseInt(t); return m && m <= 20;
+                var t = r.time || '';
+                var m = parseInt(t);
+                return m && m <= 20;
             });
         } else {
             recipes = recipes.filter(function(r) {
@@ -405,7 +345,7 @@ function renderAll() {
                 return kws.some(function(kw) { return text.indexOf(kw) >= 0; });
             });
         }
-    
+    }
     
     var keyword = document.getElementById('search-input').value.toLowerCase();
     if (keyword) {
@@ -422,7 +362,7 @@ function renderAll() {
 function renderCards(recipes) {
     var container = document.getElementById('card-list');
     if (!recipes.length) {
-        container.innerHTML = '<div class="empty">没有找到匹配的菜，试试换个说法？</div>';
+        container.innerHTML = '<div class="empty">🍽️ 没有找到匹配的菜，试试换个说法？</div>';
         return;
     }
     
@@ -443,7 +383,7 @@ function renderCards(recipes) {
         html += '<div class="name">' + r.name + scoreStar + '</div>';
         html += '<div class="meta">';
         html += '<span class="tag ' + diffClass + '">' + (r.difficulty || '?') + '</span>';
-        html += '<span class="time">' + (r.time || '?') + '</span>';
+        html += '<span class="time">⏱ ' + (r.time || '?') + '</span>';
         html += '</div>';
         html += '<div class="ingredients">' + ings + '</div>';
         html += reasonsHtml;
@@ -468,9 +408,9 @@ function openDetail(idx) {
     content.innerHTML = '<h2>' + r.name + '</h2>' +
         '<div style="display:flex;gap:8px;align-items:center;margin-bottom:12px">' +
         '<span class="tag ' + diffClass + '">' + (r.difficulty || '?') + '</span>' +
-        '<span style="font-size:13px;color:#7f8c8d">' + (r.time || '?') + '</span></div>' +
-        '<div style="font-size:14px;color:#7f8c8d;margin-bottom:8px">食材：' + (r.ingredients || []).join('、') + '</div>' +
-        '<h3 style="margin:16px 0 8px">做法</h3>' +
+        '<span style="font-size:13px;color:#999089">⏱ ' + (r.time || '?') + '</span></div>' +
+        '<div style="font-size:14px;color:#999089;margin-bottom:8px">食材：' + (r.ingredients || []).join('、') + '</div>' +
+        '<h3 style="margin:16px 0 10px;color:#3d3432">📝 做法</h3>' +
         '<div>' + stepsHtml + '</div>' +
         '<button class="btn-close" onclick="closeModal()">知道了</button>';
     document.getElementById('modal').style.display = 'flex';
@@ -490,7 +430,7 @@ async function toggleFavorite(name, btn) {
         body: JSON.stringify({dish: name})
     });
     profile = await res.json();
-    toast(isFav ? '已取消收藏' : '已加入收藏');
+    toast(isFav ? '已取消收藏' : '已加入收藏 ❤️');
     refreshCurrentView();
 }
 
@@ -514,7 +454,7 @@ async function orderDish(name, btn) {
         body: JSON.stringify({dish: name})
     });
     await res.json();
-    toast('今天吃「' + name + '」！已记录');
+    toast('✅ 今天吃「' + name + '」！已记录');
     await loadProfile();
 }
 
@@ -551,10 +491,10 @@ function renderProfile() {
         tasteHtml += '<div style="margin-bottom:12px">' +
             '<div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">' +
             '<span>' + (tasteEmoji[key]||'') + ' ' + (tasteNames[key]||key) + '</span>' +
-            '<span style="color:#e74c3c;font-weight:600">' + labels[val] + '</span></div>' +
+            '<span style="color:#d9776c;font-weight:600">' + labels[val] + '</span></div>' +
             '<div style="display:flex;gap:4px">';
         for (var i = 0; i <= 5; i++) {
-            tasteHtml += '<div style="flex:1;height:6px;border-radius:3px;background:' + (i <= val ? '#e74c3c' : '#f0e0e0') + '"></div>';
+            tasteHtml += '<div style="flex:1;height:6px;border-radius:3px;background:' + (i <= val ? '#d9776c' : '#ede8e2') + '"></div>';
         }
         tasteHtml += '</div></div>';
     });
@@ -563,31 +503,31 @@ function renderProfile() {
     var topHtml = '';
     if (topDishes.length) {
         topDishes.forEach(function(d, i) {
-            topHtml += '<div style="padding:6px 0;border-bottom:1px solid #f0e0e0;display:flex;justify-content:space-between">' +
+            topHtml += '<div style="padding:6px 0;border-bottom:1px solid #ede8e2;display:flex;justify-content:space-between">' +
                 '<span>' + (i+1) + '. ' + d.name + '</span>' +
-                '<span style="color:#7f8c8d;font-size:12px">' + d.count + '次</span></div>';
+                '<span style="color:#999089;font-size:12px">' + d.count + '次</span></div>';
         });
     } else {
-        topHtml = '<div style="color:#7f8c8d;font-size:13px">还没有点菜记录</div>';
+        topHtml = '<div style="color:#999089;font-size:13px">还没有点菜记录</div>';
     }
     
     var favCuisines = (pref.favorite_cuisines || []).map(function(c) {
-        return '<span style="background:#fce4ec;color:#e74c3c;padding:2px 10px;border-radius:10px;font-size:12px;margin:2px">' + c + '</span>';
-    }).join('') || '<span style="color:#7f8c8d;font-size:13px">还没设置</span>';
+        return '<span style="background:#fdf2f0;color:#d9776c;padding:4px 12px;border-radius:10px;font-size:12px;margin:2px;display:inline-block">' + c + '</span>';
+    }).join('') || '<span style="color:#999089;font-size:13px">还没设置</span>';
     
     var disliked = (pref.disliked_ingredients || []).map(function(c) {
-        return '<span style="background:#fce4ec;color:#e74c3c;padding:2px 10px;border-radius:10px;font-size:12px;margin:2px">' + c + '</span>';
-    }).join('') || '<span style="color:#7f8c8d;font-size:13px">还没有</span>';
+        return '<span style="background:#fdf2f0;color:#c0847a;padding:4px 12px;border-radius:10px;font-size:12px;margin:2px;display:inline-block">' + c + '</span>';
+    }).join('') || '<span style="color:#999089;font-size:13px">还没有</span>';
     
     view.innerHTML = 
         '<div class="profile-bar" style="margin-bottom:16px">' +
-        '<div style="font-size:28px">👩</div>' +
-        '<div><div>点菜 <b>' + (stats.total_orders || 0) + '</b> 次</div>' +
-        '<div>收藏 <b>' + ((profile.favorites || []).length) + '</b> 道</div></div></div>' +
-        '<div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:12px">口味偏好</h3>' + tasteHtml + '</div>' +
-        '<div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">喜欢的菜系</h3>' + favCuisines + '</div>' +
-        '<div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">不吃的食材</h3>' + disliked + '</div>' +
-        '<div class="card" style="margin-bottom:12px"><h3 style="margin-bottom:8px">最常点的菜</h3>' + topHtml + '</div>';
+        '<div style="font-size:32px">👩</div>' +
+        '<div><div style="font-weight:600;color:#3d3432">点菜 <b style="color:#d9776c">' + (stats.total_orders || 0) + '</b> 次</div>' +
+        '<div>收藏 <b style="color:#d9776c">' + ((profile.favorites || []).length) + '</b> 道</div></div></div>' +
+        '<div class="card" style="margin-bottom:14px"><h3 style="margin-bottom:12px;color:#3d3432">口味偏好</h3>' + tasteHtml + '</div>' +
+        '<div class="card" style="margin-bottom:14px"><h3 style="margin-bottom:10px;color:#3d3432">喜欢的菜系</h3>' + favCuisines + '</div>' +
+        '<div class="card" style="margin-bottom:14px"><h3 style="margin-bottom:10px;color:#3d3432">不吃的食材</h3>' + disliked + '</div>' +
+        '<div class="card" style="margin-bottom:14px"><h3 style="margin-bottom:10px;color:#3d3432">最常点的菜</h3>' + topHtml + '</div>';
 }
 
 init();
