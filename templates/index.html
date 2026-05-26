@@ -333,6 +333,10 @@ function renderAll() {
     
     if (currentFilter !== 'all' && tasteKeywords[currentFilter]) {
         var kws = tasteKeywords[currentFilter];
+        // 强口味类别只看菜名，避免食材误伤（如红烧鱼块放俩干辣椒≠麻辣）
+        var nameOnlyFilters = ['麻辣', '酸甜', '浓郁', '酥脆', '软糯'];
+        var matchOnNameOnly = nameOnlyFilters.indexOf(currentFilter) >= 0;
+        
         if (currentFilter === '快手') {
             recipes = recipes.filter(function(r) {
                 var t = r.time || '';
@@ -341,7 +345,7 @@ function renderAll() {
             });
         } else {
             recipes = recipes.filter(function(r) {
-                var text = r.name + ' ' + (r.ingredients || []).join(' ');
+                var text = matchOnNameOnly ? r.name : (r.name + ' ' + (r.ingredients || []).join(' '));
                 return kws.some(function(kw) { return text.indexOf(kw) >= 0; });
             });
         }
